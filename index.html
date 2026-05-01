@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>P5 Math: The Perfect Fit</title>
+    <style>
+        :root { --hdb-blue: #0ea5e9; --hdb-bg: #f8fafc; --success: #10b981; --error: #ef4444; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--hdb-bg); display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .layout { display: flex; gap: 20px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        #inventory { width: 300px; height: 650px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 10px; border-right: 1px solid #eee; }
+        .card { background: #fff; border: 2px solid #e2e8f0; border-radius: 10px; padding: 10px; display: flex; flex-direction: column; align-items: center; cursor: pointer; position: relative;}
+        .card.selected { border-color: var(--hdb-blue); background: #f0f9ff; box-shadow: 0 0 10px rgba(14, 165, 233, 0.3); }
+        .card.placed { opacity: 0.2; pointer-events: none; filter: grayscale(1); }
+        .furniture-shape { border: 1px solid rgba(0,0,0,0.1); border-radius: 4px; pointer-events: none; }
+        .rotate-btn { margin-top: 5px; padding: 4px 10px; font-size: 11px; cursor: pointer; border-radius: 5px; border: 1px solid #ccc; background: #fff; }
+        canvas { border: 5px solid #1e293b; background: #fff; cursor: crosshair; }
+        #status { margin-top: 15px; font-weight: bold; font-size: 1.2rem; text-align: center; }
+        .answer-btn { margin-top: 20px; padding: 10px 20px; background: #334155; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;}
+        #answer-key { display: none; margin-top: 20px; border: 3px double #334155; padding: 15px; border-radius: 10px; background: #f1f5f9; width: 600px; }
+    </style>
+</head>
+<body>
+
+    <div style="text-align:center; margin-bottom: 15px;">
+        <h1>🏠 The "Perfect Fit" Challenge</h1>
+        <p>Room: <b>5m x 5m</b>. Goal: Use <b>100%</b> of the area. No space can be left empty!</p>
+    </div>
+
+    <div class="layout">
+        <div id="inventory">
+            <div class="card" onclick="selectItem(this, 'Master Bed', 4, 5, '#f97316')" id="c1"><b>Master Bed</b><span>2m x 2.5m</span><div class="furniture-shape" style="width:60px; height:75px; background:#f97316"></div><button class="rotate-btn" onclick="rotateItem(event, 'c1')">Rotate ↻</button></div>
+            <div class="card" onclick="selectItem(this, 'Dining Table', 4, 4, '#10b981')" id="c2"><b>Dining Table</b><span>2m x 2m</span><div class="furniture-shape" style="width:60px; height:60px; background:#10b981"></div><button class="rotate-btn" onclick="rotateItem(event, 'c2')">Rotate ↻</button></div>
+            <div class="card" onclick="selectItem(this, 'Sectional Sofa', 6, 2, '#ef4444')" id="c3"><b>Sectional Sofa</b><span>3m x 1m</span><div class="furniture-shape" style="width:90px; height:30px; background:#ef4444"></div><button class="rotate-btn" onclick="rotateItem(event, 'c3')">Rotate ↻</button></div>
+            <div class="card" onclick="selectItem(this, 'Single Bed', 2, 4, '#ec4899')" id="c4"><b>Single Bed</b><span>1m x 2m</span><div class="furniture-shape" style="width:30px; height:60px; background:#ec4899"></div><button class="rotate-btn" onclick="rotateItem(event, 'c4')">Rotate ↻</button></div>
+            <div class="card" onclick="selectItem(this, 'Large Wardrobe', 2, 4, '#8b5cf6')" id="c5"><b>Wardrobe</b><span>1m x 2m</span><div class="furniture-shape" style="width:30px; height:60px; background:#8b5cf6"></div><button class="rotate-btn" onclick="rotateItem(event, 'c5')">Rotate ↻</button></div>
+            <div class="card" onclick="selectItem(this, 'Study Desk', 3, 2, '#a855f7')" id="c6"><b>Study Desk</b><span>1.5m x 1m</span><div class="furniture-shape" style="width:45px; height:30px; background:#a855f7"></div><button class="rotate-btn" onclick="rotateItem(event, 'c6')">Rotate ↻</button></div>
+            <div class="card" onclick="selectItem(this, 'Drawer Unit', 3, 2, '#fbbf24')" id="c7"><b>Drawer Unit</b><span>1.5m x 1m</span><div class="furniture-shape" style="width:45px; height:30px; background:#fbbf24"></div><button class="rotate-btn" onclick="rotateItem(event, 'c7')">Rotate ↻</button></div>
+            <div class="card" onclick="selectItem(this, 'Fridge', 2, 2, '#f59e0b')" id="c8"><b>Fridge</b><span>1m x 1m</span><div class="furniture-shape" style="width:30px; height:30px; background:#f59e0b"></div><button class="rotate-btn" onclick="rotateItem(event, 'c8')">Rotate ↻</button></div>
+            <div class="card" onclick="selectItem(this, 'Washer', 2, 2, '#94a3b8')" id="c9"><b>Washer</b><span>1m x 1m</span><div class="furniture-shape" style="width:30px; height:30px; background:#94a3b8"></div><button class="rotate-btn" onclick="rotateItem(event, 'c9')">Rotate ↻</button></div>
+            <div class="card" onclick="selectItem(this, 'Armchair', 2, 2, '#06b6d4')" id="c10"><b>Armchair</b><span>1m x 1m</span><div class="furniture-shape" style="width:30px; height:30px; background:#06b6d4"></div><button class="rotate-btn" onclick="rotateItem(event, 'c10')">Rotate ↻</button></div>
+            <div class="card" onclick="selectItem(this, 'End Table', 2, 2, '#2dd4bf')" id="c11"><b>End Table</b><span>1m x 1m</span><div class="furniture-shape" style="width:30px; height:30px; background:#2dd4bf"></div><button class="rotate-btn" onclick="rotateItem(event, 'c11')">Rotate ↻</button></div>
+            <div class="card" onclick="selectItem(this, 'Bookshelf', 1, 4, '#475569')" id="c12"><b>Bookshelf</b><span>0.5m x 2m</span><div class="furniture-shape" style="width:15px; height:60px; background:#475569"></div><button class="rotate-btn" onclick="rotateItem(event, 'c12')">Rotate ↻</button></div>
+            <div class="card" onclick="selectItem(this, 'TV Console', 1, 4, '#3b82f6')" id="c13"><b>TV Console</b><span>0.5m x 2m</span><div class="furniture-shape" style="width:15px; height:60px; background:#3b82f6"></div><button class="rotate-btn" onclick="rotateItem(event, 'c13')">Rotate ↻</button></div>
+        </div>
+
+        <div>
+            <canvas id="studioCanvas" width="400" height="400"></canvas>
+            <div id="status">Items Placed: 0 / 13</div>
+            <button class="reset-btn" style="margin-top:10px; width:100%; padding:10px; cursor:pointer;" onclick="location.reload()">Reset Room</button>
+        </div>
+    </div>
+
+    <button class="answer-btn" onclick="document.getElementById('answer-key').style.display='block'">View Puzzle Key (Teachers Only)</button>
+    <div id="answer-key">
+        <h3>Master Solution Grid ($10 \times 10$ Units)</h3>
+        <p>The total area is exactly 100 square units. Any overlap or rotation error will leave a piece without a home.</p>
+        <table border="1" style="width:100%; text-align:center; border-collapse:collapse; background: white;">
+            <tr><th>Item</th><th>Coordinates (X,Y)</th><th>Orientation</th><th>Area (Units)</th></tr>
+            <tr><td>Master Bed</td><td>0,0</td><td>4x5</td><td>20</td></tr>
+            <tr><td>Dining Table</td><td>4,0</td><td>4x4</td><td>16</td></tr>
+            <tr><td>Single Bed</td><td>8,0</td><td>2x4</td><td>8</td></tr>
+            <tr><td>Sofa</td><td>4,4</td><td>6x2</td><td>12</td></tr>
+            <tr><td>Wardrobe</td><td>0,5</td><td>2x4</td><td>8</td></tr>
+            <tr><td>Desk & Drawer</td><td>2,5</td><td>3x4 (total)</td><td>12</td></tr>
+            <tr><td>Appliances</td><td>5,6</td><td>4x4 (total 4 items)</td><td>16</td></tr>
+            <tr><td>Storage/Misc</td><td>9,4</td><td>1x6 (total 2 items)</td><td>8</td></tr>
+        </table>
+    </div>
+
+<script>
+    const canvas = document.getElementById('studioCanvas');
+    const ctx = canvas.getContext('2d');
+    const grid = 40; 
+    let currentItem = null;
+    let placedItems = [];
+    let mouseGrid = { x: 0, y: 0 };
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Grid lines
+        ctx.strokeStyle = "#f1f5f9";
+        for (let i = 0; i <= canvas.width; i += grid) {
+            ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke();
+        }
+        // Placed items
+        placedItems.forEach(f => {
+            ctx.fillStyle = f.color;
+            ctx.fillRect(f.x, f.y, f.w * grid, f.h * grid);
+            ctx.strokeStyle = "rgba(0,0,0,0.2)";
+            ctx.strokeRect(f.x, f.y, f.w * grid, f.h * grid);
+            ctx.fillStyle = "white";
+            ctx.font = "bold 9px Arial";
+            ctx.fillText(f.name, f.x + 4, f.y + 12);
+        });
+        // Preview
+        if (currentItem) {
+            const isValid = checkValid(mouseGrid.x, mouseGrid.y, currentItem.w, currentItem.h);
+            ctx.fillStyle = isValid ? "rgba(16, 185, 129, 0.4)" : "rgba(239, 68, 68, 0.4)";
+            ctx.fillRect(mouseGrid.x, mouseGrid.y, currentItem.w * grid, currentItem.h * grid);
+        }
+    }
+
+    function selectItem(el, name, w, h, color) {
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        currentItem = { id: el.id, name, w, h, color };
+        document.getElementById('status').innerText = `Selected: ${name}`;
+        draw();
+    }
+
+    function rotateItem(e, id) {
+        e.stopPropagation();
+        const card = document.getElementById(id);
+        const shape = card.querySelector('.furniture-shape');
+        const oldW = parseInt(shape.style.width);
+        const oldH = parseInt(shape.style.height);
+        shape.style.width = oldH + 'px';
+        shape.style.height = oldW + 'px';
+        if (currentItem && currentItem.id === id) {
+            const temp = currentItem.w; currentItem.w = currentItem.h; currentItem.h = temp;
+        }
+        draw();
+    }
+
+    canvas.onmousemove = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        mouseGrid.x = Math.floor((e.clientX - rect.left) / grid) * grid;
+        mouseGrid.y = Math.floor((e.clientY - rect.top) / grid) * grid;
+        draw();
+    };
+
+    canvas.onclick = () => {
+        if (!currentItem) return;
+        if (checkValid(mouseGrid.x, mouseGrid.y, currentItem.w, currentItem.h)) {
+            placedItems.push({ ...currentItem, x: mouseGrid.x, y: mouseGrid.y });
+            document.getElementById(currentItem.id).classList.add('placed');
+            currentItem = null;
+            document.getElementById('status').innerText = `Placed: ${placedItems.length}/13`;
+            draw();
+            if (placedItems.length === 13) {
+                document.getElementById('status').style.color = "#10b981";
+                document.getElementById('status').innerText = "🏆 MASTER OF SPACE: 100% FIT!";
+            }
+        }
+    };
+
+    function checkValid(x, y, w, h) {
+        if (x + w * grid > canvas.width || y + h * grid > canvas.height) return false;
+        return !placedItems.some(f => !(x + w * grid <= f.x || x >= f.x + f.w * grid || y + h * grid <= f.y || y >= f.y + f.h * grid));
+    }
+
+    draw();
+</script>
+</body>
+</html>
